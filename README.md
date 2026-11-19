@@ -134,8 +134,24 @@ All endpoints except login require `Authorization: Bearer <token>`.
 
 ## Scope and Limitations
 
-- GCash is recorded but not processed through a live payment API.
-- No automatic billing or invoicing.
-- No maintenance scheduling.
-- Web-based only.
-- Admin sessions are stored in memory and reset when the API restarts.
+### Scope
+
+The Online Boarding Dormitory Management System is a browser-based application for an administrator to manage the day-to-day records of a single boarding house or dormitory. Its implemented functions include:
+
+- Maintaining room records, including room number, capacity, monthly rent, and vacant, occupied, or maintenance status; viewing room occupancy; and preventing assignments beyond room capacity.
+- Maintaining tenant records, including contact and guardian details, assigned room, move-in date, and active or moved-out status; searching tenant records; updating details; and recording a tenant's move-out.
+- Recording rent payments for active tenants by cash or GCash, including the billing month, amount, payment date, notes, and GCash reference number when applicable.
+- Calculating tenant balances from the recorded rent and payments, and displaying dashboard information such as room and tenant counts, collections, recent payments, and outstanding balances.
+- Viewing monthly payment totals and payment counts through the reports function.
+- Restricting management pages and API operations to an authenticated administrator.
+
+### Limitations
+
+- The system records GCash payment details only. It does not connect to GCash or verify, transfer, or process payments automatically.
+- Rent billing and payment entry are manual. The system calculates balances from stored records but does not automatically issue invoices, send payment reminders, or collect rent.
+- The application provides one administrator login and does not include tenant accounts, multiple user roles, or fine-grained permissions.
+- Administrator sessions are held in server memory and are cleared when the API server restarts, so users must sign in again.
+- The system does not include visitor-log management, maintenance scheduling or work-order tracking, expense tracking, or communication/notification features.
+- The system is designed for browser access and does not provide a dedicated mobile application.
+- Reports are limited to the information currently implemented, such as monthly recorded collections and calculated tenant balances; they do not represent audited financial statements.
+- Records and calculations depend on accurate data entry and the availability of the configured MySQL database and server. The system does not provide a separate backup or recovery feature.
