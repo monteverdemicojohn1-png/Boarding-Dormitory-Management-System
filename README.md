@@ -1,15 +1,15 @@
-# Boarding-Dormitory-Management-System
+# Online Boarding Dormitory Management System
 
 A web-based system for managing boarding houses and dormitories: tenant records, room
 occupancy, and monthly rental payment tracking (including GCash payment recording) —
 replacing handwritten logbooks and notebooks.
 
-**Course:** Bachelor of Science in Information Technology
+**Course:** Bachelor of Science in Information Technology  
 **Adviser:** Sir John Fredrick Lim
 
 ## Group Members
 
-- Tejano, Ma. Genelle A. 
+- Tejano, Ma. Genelle A. (Group Representative)
 - Torejas, Dclyn C.
 - Cacayan, Andrew S.
 - Tanggap, Jhon Lester R.
@@ -23,147 +23,119 @@ room availability, payments, tenant information, and visitor logs are all handwr
 Checking who has paid rent or which rooms are vacant takes time and is prone to errors.
 
 This system automates record-keeping, room monitoring, and payment tracking in one
-online platform that runs in the browser, so dorm owners/managers and boarders do not
-need to install anything.
+online platform that runs in the browser.
 
 ### Main Features
 
-- **Tenant Management** — add, edit, and view tenant information, guardians, and
-  move-in / move-out dates. Moving a tenant out automatically frees their room.
-- **Room Management** — track room status (vacant, occupied, under maintenance),
-  capacity, and monthly rent. Occupied status is set automatically when tenants are
-  assigned; vacant rooms are visible instantly.
-- **Payment Monitoring** — record monthly rental payments, view running balances per
-  tenant, and see full payment history. Payments can be recorded as **Cash** or
-  **GCash** (the GCash reference number is required and stored with the record, so the
-  manager can verify the transfer).
-- **Reports** — simple summaries of monthly collections, room occupancy, and
-  outstanding balances.
-- **Admin Login** — a single administrator account protects the records.
+- **Tenant Management** — add, edit, and view tenant information, guardians, and move-in/move-out dates.
+- **Room Management** — track room status, capacity, monthly rent, and occupancy.
+- **Payment Monitoring** — record Cash and GCash payments with GCash reference numbers.
+- **Reports** — monthly collections, room occupancy, and outstanding balances.
+- **Admin Login** — protected administrator access.
 
-> Note on GCash: this system *records* GCash payments together with their reference
-> numbers for verification and tracking. It does not process live online payments
-> through the GCash API (see Scope and Limitations).
+> This system records GCash payments for verification and tracking. It does not process live GCash API transactions.
 
 ## Tech Stack
 
-| Layer    | Technology              |
-|----------|-------------------------|
-| Frontend | React (Vite)            |
-| Backend  | Node.js + Express       |
-| Database | MySQL                   |
+| Layer | Technology |
+|---|---|
+| Frontend | React (Vite) |
+| Backend | Node.js + Express |
+| Database | MySQL |
 
 ## Requirements
 
-- Node.js 18 or newer, with npm
+- Node.js 18 or newer
+- npm
 - MySQL 8 or MariaDB
 
 ## Setup
 
-1. **Create the database** (once). Replace `boarding_dorm` if you use another name:
+1. Create the database:
 
-   ```
-   mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS boarding_dorm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-   ```
+```sql
+CREATE DATABASE IF NOT EXISTS boarding_dorm
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+```
 
-2. **Configure the server**:
+2. Configure the server:
 
-   ```
-   cd server
-   copy .env.example .env      (Windows)
-   cp .env.example .env        (Mac/Linux)
-   ```
+```bash
+cd server
+cp .env.example .env
+```
 
-   Then edit `server/.env` — set your MySQL password and the initial admin account
-   (`ADMIN_USERNAME` / `ADMIN_PASSWORD`).
+On Windows:
 
-3. **Start the API** (it creates the tables automatically on first run):
+```cmd
+copy .env.example .env
+```
 
-   ```
-   cd server
-   npm install
-   npm run dev
-   ```
+Edit `server/.env` with the MySQL credentials and initial admin account.
 
-   The API runs at `http://localhost:5000`.
+3. Start the API:
 
-4. **Start the frontend** (in a second terminal):
+```bash
+cd server
+npm install
+npm run dev
+```
 
-   ```
-   cd client
-   npm install
-   npm run dev
-   ```
+The API runs at `http://localhost:5000`.
 
-   Open the address Vite prints, usually `http://localhost:5173`, and log in with the
-   admin account from `server/.env`.
+4. Start the frontend in another terminal:
 
-5. **(Optional) Demo data** — with the API running and the rooms table empty:
+```bash
+cd client
+npm install
+npm run dev
+```
 
-   ```
-   cd server
-   npm run seed
-   ```
+Open `http://localhost:5173` and sign in using `server/.env` credentials.
 
-   This inserts 6 sample rooms, 4 tenants, and some sample payments.
+5. Optional demo data:
+
+```bash
+cd server
+npm run seed
+```
 
 ## Project Structure
 
-```
-├── client/                 React frontend (Vite)
-│   └── src/
-│       ├── pages/          Dashboard, Tenants, Rooms, Payments, Reports, Login
-│       ├── components/     Layout (sidebar) and Modal
-│       └── api.js          Fetch helper (token + base URL)
-└── server/                 Express backend
-    └── src/
-        ├── index.js        App entry, auth, dashboard endpoint
-        ├── db.js           MySQL pool + schema loader
-        ├── schema.sql      Tables (auto-created on start)
-        ├── helpers.js      Balance computation, room status sync
-        ├── seed.js         Optional demo data
-        └── routes/         tenants, rooms, payments, reports
+```text
+client/
+  src/
+    pages/
+    components/
+    api.js
+server/
+  src/
+    routes/
+    index.js
+    db.js
+    helpers.js
+    schema.sql
+    seed.js
 ```
 
 ## API Overview
 
 All endpoints except login require `Authorization: Bearer <token>`.
 
-- `POST /api/admin/login` — log in; returns a session token (expires after 8 hours)
-- `POST /api/admin/logout`
-- `GET /api/dashboard` — room counts, active tenants, collections, outstanding balances, recent payments
-- `GET /api/tenants?status=active|all&q=` — list tenants (active tenants include their balance)
-- `POST /api/tenants` — add a tenant (name, contacts, guardian, room, move-in date)
-- `GET /api/tenants/:id` — tenant detail with balance and payment history
-- `PATCH /api/tenants/:id` — edit tenant / reassign room
-- `POST /api/tenants/:id/move-out` — mark tenant moved out, free the room
-- `GET /api/rooms` — rooms with occupant counts and tenant names
-- `POST /api/rooms` / `PATCH /api/rooms/:id` / `DELETE /api/rooms/:id`
-- `GET /api/payments?tenant_id=&method=&month=` — payment history
-- `POST /api/payments` — record a payment (`method: cash|gcash`, GCash requires `gcash_reference`)
-- `GET /api/payments/balances` — due / paid / balance for every active tenant
-- `GET /api/reports/monthly?year=2026` — collections grouped by billing period
-
-A tenant's balance is computed as:
-
-> monthly rent × number of months since move-in (up to move-out month) − total payments
+- `POST /api/admin/login`
+- `GET /api/dashboard`
+- `GET|POST /api/tenants`
+- `PATCH|POST /api/tenants/:id`
+- `GET|POST|PATCH|DELETE /api/rooms`
+- `GET|POST /api/payments`
+- `GET /api/payments/balances`
+- `GET /api/reports/monthly?year=2026`
 
 ## Scope and Limitations
 
-- Records GCash payments with reference numbers; does **not** process live online
-  payment transactions through the GCash API.
-- No automatic billing or invoicing — payments are recorded by the manager.
-- Does not include facility maintenance scheduling.
-- Web-based only; not a mobile app.
-- Admin sessions are stored in memory and are cleared when the API restarts.
-
-## Verify
-
-```
-cd server
-npm install
-npm start
-cd ..\client
-npm install
-npm run build
-```
+- GCash is recorded but not processed through a live payment API.
+- No automatic billing or invoicing.
+- No maintenance scheduling.
+- Web-based only.
+- Admin sessions are stored in memory and reset when the API restarts.
