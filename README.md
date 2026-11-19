@@ -9,7 +9,7 @@ replacing handwritten logbooks and notebooks.
 
 ## Group Members
 
-- Tejano, Ma. Genelle A. (Group Representative)
+- Tejano, Ma. Genelle A. 
 - Torejas, Dclyn C.
 - Cacayan, Andrew S.
 - Tanggap, Jhon Lester R.
